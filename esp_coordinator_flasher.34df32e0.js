@@ -723,7 +723,9 @@ filesDiv.style.display = "none";
  */ function handleFileSelect(evt) {
     const file = evt.target.files[0];
     //const file = "./BOOT_IMG/c6_0101/bootloader.bin";
-    //const file = "https://github.com/cheldonec/esp_coordinator_web_flash/blob/main/BOOT_IMG/c6_0101/bootloader.bin";
+    //const file = 'https://github.com/cheldonec/esp_coordinator_web_flash/blob/main/BOOT_IMG/c6_0101/bootloader.bin';
+    //const fileUrl_bl = './BOOT_IMG/c6_0101/bootloader.bin';
+    //downloadFile(fileUrl_bl, 'bootloader.bin');
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev)=>{
@@ -822,7 +824,7 @@ addFileButton.onclick = ()=>{
     // Column 4  - Remove File
     const cell4 = row.insertCell(3);
     cell4.classList.add("action-cell");
-    if (rowCount > 1) {
+    if (rowCount > 0) {
         const element4 = document.createElement("input");
         element4.type = "button";
         const btnName = "button" + rowCount;
@@ -949,7 +951,8 @@ programButton.onclick = async ()=>{
         const row = table.rows[index];
         const offSetObj = row.cells[0].childNodes[0];
         const offset = parseInt(offSetObj.value);
-        const fileObj = row.cells[1].childNodes[0]; //https://github.com/cheldonec/esp_coordinator_web_flash/blob/main/BOOT_IMG/c6_0101/bootloader.bin
+        const fileObj = row.cells[1].childNodes[0];
+        //https://github.com/cheldonec/esp_coordinator_web_flash/blob/main/BOOT_IMG/c6_0101/bootloader.bin
         //const fileObj = "https://github.com/cheldonec/esp_coordinator_web_flash/blob/main/BOOT_IMG/c6_0101/bootloader.bin" as ChildNode & { data: string };
         const progressBar = row.cells[2].childNodes[0];
         progressBar.textContent = "0";
@@ -985,7 +988,61 @@ programButton.onclick = async ()=>{
         }
     }
 };
-addFileButton.onclick(undefined);
+//addFileButton.onclick(this);
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+async function downloadFile(url, filename) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+    } catch (error) {
+        console.error('There was a problem with the download:', error);
+    }
+}
+function AddBinFiles() {
+    let rowCount = table.rows.length;
+    const row1_1 = table.insertRow(rowCount);
+    //Column 1 - Offset
+    const cell1_1 = row1_1.insertCell(0);
+    const element1_1 = document.createElement("input");
+    element1_1.type = "text";
+    element1_1.id = "offset" + rowCount;
+    element1_1.value = "0x0000";
+    cell1_1.appendChild(element1_1);
+    // Column 2 - File selector
+    const cell2_1 = row1_1.insertCell(1);
+    const element2_1 = document.createElement("input");
+    element2_1.type = "file";
+    element2_1.id = "selectFile" + rowCount;
+    element2_1.name = "selected_File" + rowCount;
+    //element2_1.addEventListener("change", handleFileSelect, false);
+    const fileUrl_bl = './BOOT_IMG/c6_0101/bootloader.bin';
+    downloadFile(fileUrl_bl, 'bootloader.bin');
+    element2_1.addEventListener("change", handleFileSelect, false);
+    cell2_1.appendChild(element2_1);
+    rowCount = table.rows.length;
+    const row1_2 = table.insertRow(rowCount);
+    const cell1_2 = row1_2.insertCell(0);
+    const element1_2 = document.createElement("input");
+    element1_2.type = "text";
+    element1_2.id = "offset" + rowCount;
+    element1_2.value = "0x8000";
+    cell1_2.appendChild(element1_2);
+    // Column 2 - File selector
+    const cell2_2 = row1_2.insertCell(1);
+    const element2_2 = document.createElement("input");
+    element2_2.type = "file";
+    element2_2.id = "selectFile" + rowCount;
+    element2_2.name = "selected_File" + rowCount;
+    element2_2.addEventListener("change", handleFileSelect, false);
+    cell2_2.appendChild(element2_2);
+}
+AddBinFiles();
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 cmdOpenNetworkButton.onclick = async ()=>{
     //let data = new Uint8Array([0xAD, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x01, 0xE8, 0x03, 0x78, 0xD8, 0x4B]);
     //let data = new Uint8Array(0xAD, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x01, 0xE8, 0x03, 0x78, 0xD8, 0x4B);
